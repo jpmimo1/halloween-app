@@ -1,10 +1,39 @@
 'use client'
-import { AdvancedImage } from '@cloudinary/react';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { CloudinaryUploadWidget } from './CloudinaryUploadWidget';
-import { Cloudinary } from '@cloudinary/url-gen/index';
-import { scale } from '@cloudinary/url-gen/actions/resize';
-import { backgroundRemoval, dropShadow } from '@cloudinary/url-gen/actions/effect';
+import { Cloudinary, CloudinaryImage } from '@cloudinary/url-gen';
+import { fill } from '@cloudinary/url-gen/actions/resize';
+import { toast } from 'react-toastify';
+import { focusOn } from '@cloudinary/url-gen/qualifiers/gravity';
+import { face } from '@cloudinary/url-gen/qualifiers/focusOn';
+
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const validPhoto = (imageData: any | null) => {
+  if (
+    !imageData ||
+    !imageData.info ||
+    !imageData.info.detection ||
+    !imageData.info.detection.object_detection ||
+    !imageData.info.detection.object_detection.data ||
+    !imageData.info.detection.object_detection.data['human-anatomy'] ||
+    !imageData.info.detection.object_detection.data['human-anatomy'].tags
+  ) {
+    return false;
+  }
+
+  const tags = imageData.info.detection.object_detection.data['human-anatomy'].tags;
+
+  const leftFace = tags['left-face'];
+  const rightFace = tags['right-face'];
+
+  if (!leftFace || !rightFace) {
+    return false;
+  }
+
+  return true;
+};
+
 
 const cld = new Cloudinary({
   cloud: {
@@ -12,42 +41,71 @@ const cld = new Cloudinary({
   }
 });
 
-export const UploadValidImageShow = () => {
+
+interface IProps {
+  onImageSelect: (imageId: string) => void
+  isInvalid?: boolean
+  errorMessage?: string
+}
+
+export const UploadValidImageShow = ({
+  onImageSelect,
+  errorMessage = '',
+  isInvalid = false
+}: IProps) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [imageData, setImageData] = useState<any | null>(null);
+  const [imageCld, setImageCld] = useState<CloudinaryImage | null>(null);
+  const [imageUrl, setImageUrl] = useState('');
 
   useEffect(() => {
-    console.log(imageData);
+    if (!imageData) {
+      return;
+    }
+    const isValid = validPhoto(imageData);
+    if (!isValid) {
+      toast.warn('Invalid image. Please select a photo with your face.');
+      return;
+    }
+
+    generateCldImage();
   }, [imageData]);
 
-  const imageCld = useMemo(() => {
+  const generateCldImage = () => {
     if (!imageData || !imageData.public_id) {
-      return null;
+      setImageCld(null);
     }
 
     const imagePrev = cld.image(imageData.public_id);
 
     imagePrev
-    .effect(backgroundRemoval())
-    // .effect(dropShadow().azimuth(90).elevation(45).spread(50))
-    .resize(scale().width(500).height(600))
-    .format('auto')
-    .quality('auto')
+      .resize(fill().width(400).height(400).gravity(focusOn(face())))
+      .format('auto')
+      .quality('auto');
 
-    return imagePrev;
+    // .resize(pad().width(500).height(600).background(generativeFill()))
+    // .effect(generativeBackgroundReplace().prompt('cemetery at night with fog'))
+    // .effect(generativeReplace().from('clothes').to('vampire costume'))
 
-  }, [imageData]);
+    setImageCld(imagePrev);
+  }
+
 
   useEffect(() => {
     if (imageCld) {
-      console.log(imageCld.toURL())
+      setImageUrl(imageCld.toURL());
+      onImageSelect(imageData.public_id);
     }
   }, [imageCld]);
 
   return (
     <>
-      <CloudinaryUploadWidget setImageData={setImageData} />
-      {imageCld ? <AdvancedImage cldImg={imageCld} /> : null}
+      <CloudinaryUploadWidget
+        setImageData={setImageData}
+        url={imageUrl}
+        errorMessage={errorMessage}
+        isInvalid={isInvalid}
+      />
     </>
-  )
+  );
 }
