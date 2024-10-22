@@ -6,19 +6,15 @@ interface IProps {
   params: { page: string };
 }
 
-const guestsByPage = 3;
+const guestsByPage = 8;
 
 export default async function Guests({ params }: IProps) {
   const { page } = params;
-
-  console.log(page);
 
   const prisma = new PrismaClient();
   const totalGuests = await prisma.guest.count();
 
   const totalPages = Math.ceil(totalGuests / guestsByPage);
-  console.log(totalGuests);
-  console.log(totalPages);
 
   const guestsPage = await prisma.guest.findMany({
     skip: (Number.parseInt(page) - 1) * guestsByPage,
@@ -28,14 +24,13 @@ export default async function Guests({ params }: IProps) {
     }
   });
 
-  console.log(guestsPage);
-
   await prisma.$disconnect();
 
   return (
     <div className="flex flex-col gap-4">
       <GridGuests guests={guestsPage} />
       <PaginationGuests total={totalPages} baseUrl="guests" currentPage={Number.parseInt(page)} />
-    </div>);
+    </div>
+  );
 
 }
