@@ -13,7 +13,7 @@ export const Header = () => {
   const scrollYPrev = useRef<number>(0);
   const timeoutOp = useRef<NodeJS.Timeout>();
 
-  const onScrollEvent = (e: Event) => {
+  const onScrollEvent = () => {
     if (timeoutOp.current) {
       clearTimeout(timeoutOp.current);
     }
