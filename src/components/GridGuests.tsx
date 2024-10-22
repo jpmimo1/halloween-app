@@ -14,12 +14,12 @@ export const GridGuests = ({ guests }: IProps) => {
     <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4'>
       {
         guests.map((guest) => {
-          const { photo_costume_url, name: guestName, costume } = guest;
+          const { photo_costume_url, name: guestName, costume, id } = guest;
 
           const { name: costumeName } = costume || {};
 
           return (
-            <div>
+            <div key={id}>
               <Card className='flex justify-center items-center'>
                 <ImageWithTransformations url={photo_costume_url} />
               </Card>

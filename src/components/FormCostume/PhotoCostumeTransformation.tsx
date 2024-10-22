@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react'
 import { ImageWithTransformations, StatusImage } from '../ImageWithTransformations'
 import { Card } from '@nextui-org/react'
 import { Cloudinary, CloudinaryImage } from '@cloudinary/url-gen'
-import { fill } from '@cloudinary/url-gen/actions/resize'
 
 interface IProps {
   costume?: costume

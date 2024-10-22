@@ -1,9 +1,9 @@
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { listCostumes } from "./data";
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
     const prisma = new PrismaClient();
 

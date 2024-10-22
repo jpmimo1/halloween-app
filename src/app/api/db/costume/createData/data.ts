@@ -1,4 +1,3 @@
-import { costume } from "@prisma/client";
 interface CostumeData {
   name: string
   description: string
