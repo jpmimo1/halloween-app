@@ -20,6 +20,7 @@ const cld = new Cloudinary({
 const transformations = {
   'firstResize': 'c_fill,g_face,h_520,w_400',
   'secondResize': 'b_gen_fill,c_pad,g_south,h_650,w_500',
+  'darken': 'e_brightness:-20/e_contrast:40',
   'format': 'f_auto',
   'quality': 'q_auto',
 };
@@ -30,6 +31,8 @@ const normalizeText = (text: string) => {
     .toLowerCase();
 }
 
+const replacementPromp = 'clothes';
+
 const generateCostumeTransformation = (costume?: costume): string[] => {
   if (!costume) {
     return [];
@@ -37,6 +40,11 @@ const generateCostumeTransformation = (costume?: costume): string[] => {
   let costumeTransformations: string[] = [];
   if (costume.background_promp) {
     const promp = `e_gen_background_replace:prompt_${normalizeText(costume.background_promp)}`;
+    costumeTransformations = [...costumeTransformations, promp];
+  }
+
+  if (costume.costume_promp) {
+    const promp = `e_gen_replace:from_${replacementPromp};to_${normalizeText(costume.costume_promp)}`;
     costumeTransformations = [...costumeTransformations, promp];
   }
 
@@ -64,18 +72,11 @@ export const PhotoCostumeTransformation = ({
         transformations.firstResize,
         transformations.secondResize,
         ...generateCostumeTransformation(costume),
+        transformations.darken,
         transformations.format,
         transformations.quality
       ].join('/')
     );
-
-    // imagePrev
-    //   .resize(fill().width(400).height(400).gravity(focusOn(face())))
-    //   .resize(pad().width(500).height(600).background(generativeFill()))
-    //   .effect(generativeBackgroundReplace().prompt('cemetery at night with fog'))
-    //   .effect(generativeReplace().from('clothes').to('vampire costume'))
-    //   .format('auto')
-    //   .quality('auto');
 
     setImageCld(imagePrev);
 

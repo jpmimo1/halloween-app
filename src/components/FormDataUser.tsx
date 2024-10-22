@@ -51,7 +51,7 @@ export const FormDataUser = () => {
   return (
     <div className='max-w-[250px] flex flex-col gap-5 mx-auto'>
       <div>
-        <p className='text-center mb-1 text-primary'>Select your photo</p>
+        <p className='text-center mb-1 text-primary text-lg font-creepster'>Select your photo</p>
         <UploadValidImageShow
           onImageSelect={(imageSelect) => { setImageId(imageSelect); }}
           errorMessage={imageIdError}

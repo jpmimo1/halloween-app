@@ -118,7 +118,7 @@ export const FormCostume = (
       {
         costumeSelect ?
           <div className='flex flex-col justify-center items-center flex-wrap'>
-            {`${guestName} will be dressed as :`} <div className='ml-3 text-primary-400 text-xl'>{costumeSelect.name}</div>
+            {`${guestName} will be dressed as :`} <div className='ml-3 text-primary-400 text-xl font-creepster'>{costumeSelect.name}</div>
           </div> :
           null
       }
