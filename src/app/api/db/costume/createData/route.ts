@@ -5,11 +5,11 @@ import { listCostumes } from "./data";
 
 export async function GET() {
   try {
-    const prisma = new PrismaClient();
+    // const prisma = new PrismaClient();
 
-    await prisma.costume.createMany({ data: listCostumes })
+    // await prisma.costume.createMany({ data: listCostumes })
 
-    await prisma.$disconnect();
+    // await prisma.$disconnect();
 
     return NextResponse.json('success');
   } catch (ex) {
